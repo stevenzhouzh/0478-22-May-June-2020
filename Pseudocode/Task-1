@@ -1,0 +1,91 @@
+//1. Variable declaring and initializing
+arrivalDay ← 0 //the day of the week the customer arrived
+arrivalHour ← 0 //the hour the customer arrived
+departHour ← 0 //the hour the customer depart
+customerStayHour ← 0 //the number of hours the customer leave their car
+customerFPNChoice ← FALSE //whether or not the customer have a frequent parking number
+freqParkingNum ← 00000 //the frequent parking number which customer input
+maxStayHour ← [8,2,2,2,2,2,4] //the maximum hour a customer can leave their car for different day of the week
+dayPricePerHour ← [2.00,10.00,10.00,10.00,10.00,10.00,3.00] //the price per hour of parking for each day of the wee if parking between 8:00-15:59
+nightPrice ← 2.00 //the price of parking if after 16:00
+weekDay ← ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"] //the day of the week
+price ← 0.00 //the price without discount
+finalPrice ← 0.00 //the price with discount
+discount ← 0.00 //the discount applied
+checkDigitNum ← 00000
+count ← 0.00
+digit ← 0.00
+checkDigitSum ← 0.00
+
+
+//2. day input by customer
+REPEAT
+	OUTPUT "Please enter the day number, as shown below"
+	OUTPUT "1-Sunday; 2-Monday; 3-Tuesday; 4-Wednesday; 5-	Thursday; 6-Friday; 7-Saturday"
+	INPUT arrivalDay
+UNTIL arrivalDay >=1 AND arrivalDay <=7  //validation check
+
+
+//3. arrival hour input by customer
+REPEAT
+	OUTPUT "Please enter the arrival hour excluding minutes (for example 15:45 would be 15), No parking is allowed between Midnight and 08:00"
+	INPUT arrivalHour
+UNTIL arrivalHour >=8 AND arrivalHour <=24 //validation check
+
+
+//4. the number of hours to leave their car input by customer
+REPEAT 
+	OUTPUT "for", weekDay[arrivalDay], ", Maximum staying hour is", maxStayHour[arrivalDay]
+	OUTPUT "Please enter the number of hours to leave your car"
+	INPUT customerStayHour
+	departHour ← arrivalHour + customerStayHour
+UNTIL customerStayHour <= maxStayHour[arrivalDay] AND departHour <24 //validation check
+
+
+//5. ask if customer have freq parking number
+REPEAT
+	OUTPUT "Do you have a frequent parking number? enter TRUE if you do have one"
+	INPUT customerFPNChoice
+UNTIL customerFPNChoice = FALSE OR customerFPNChoice = TRUE
+
+//6. input freq parking number if avalible
+IF customerFPNChoice = TRUE THEN
+	REPEAT
+		OUTPUT "Please enter your frequent parking number"
+		INPUT freqParkingNum
+	UNTIL freqParkingNum >=0 AND freqParkingNum <=99999
+
+//7. separating digit and conduct modulo 11 check digit calculation
+	checkDigitNum ← freqParkingNum
+	REPEAT
+		digit ← checkDigitNum MOD 10
+		checkDigitSum ← checkDigitSum + digit * count
+		checkDigitNum ← checkDigitNum / 10
+	UNTIL digit <= 0
+	IF checkDigitSum MOD 11 = 0 THEN
+		IF arrivalHour >=16 THEN
+			discount ← 0.5 
+		ELSE
+			discount ← 0.1
+		ENDIF
+	ENDIF
+ENDIF
+
+
+//8. calculate the price required for the parking stay if parking between 8:00-15:59
+IF arrivalHour <16 THEN
+	price ← dayPricePerHour[arrivalDay] * customerStayHour
+ELSE
+//place the price of parking after 16:00
+	price ← nightPrice
+ENDIF
+finalPrice ← price * (1 - discount)
+
+
+//9. Show the information
+OUTPUT "Original Price to park:", price
+OUTPUT "Day of the week:", arrivalDay
+OUTPUT "Arrival hour:", arrivalHour
+OUTPUT "Hours stayed:", customerStayHour
+OUTPUT "Discount applied to original price:", discount
+OUTPUT "Final price:" , finalPrice
